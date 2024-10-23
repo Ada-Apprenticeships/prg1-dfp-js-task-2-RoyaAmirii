@@ -7,9 +7,27 @@ function parseFile (indata, outdata, delimiter = ';') {
 if (fs.existsSync(outdata)) {
   fs.unlinkSync(outdata);        // if output file already exists, its deleted using fs.unlinksync()
 }
-const data = fs.readFileSync(indata, 'utf-8')      //input file is being read using utf encoding
-const lines = data.split('\n');        //input data split into array of lines to process each row
-const transformedLines = [];             //initialises an array to store processed lines
+let recordcount = 0
+try  {
+  const fileContent = fs.readFileSync(indata, 'utf-8');
+  const lines = fileContent.split(/\n/);
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines [i].trim();
+    if(line === '') continue;
+    const [review,sentiment] = line.split(delimiter).map(item=>
+      item.trim());
+      const shortReview =review.substring(0, 20);
+      console.log(shortReview)
+      fs.appendFileSync (outdata, `${sentiment}${delimiter}${shortReview}\n`, 'utf-8');
+      recordcount ++;
+      
+
+    
+  }
+}
+//const data = fs.readFileSync(indata, 'utf-8')      //input file is being read using utf encoding
+//const lines = data.split('\n');        //input data split into array of lines to process each row
+//const transformedLines = [];             //initialises an array to store processed lines
 
 let totalRecordsExported = 0;
 
@@ -27,7 +45,7 @@ for (let i = 1 ; i< lines.length; i++) {      //loops through each line starting
   transformedLines.push(transformedLine)      //add transformed line to array
   totalRecordsExported++; //increment the counter for each valid record 
 }
-fs.writeFileSync(outdata, transformedLines.join('\n'), 'utf-8');  //write transformed line to the output file, joining with new line character
+fs.appendFileSync(outdata, transformedLines.join('\n'), 'utf-8');  //write transformed line to the output file, joining with new line character
 return totalRecordsExported; //return the total number of records exported
 }
 module.exports = {
