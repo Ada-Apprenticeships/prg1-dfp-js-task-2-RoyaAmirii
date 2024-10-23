@@ -7,7 +7,7 @@ function parseFile (indata, outdata, delimiter = ';') {
 if (fs.existsSync(outdata)) {
   fs.unlinkSync(outdata);        // if output file already exists, its deleted using fs.unlinksync()
 }
-let recordcount = 0
+let recordcount = 0;
 try  {
   const fileContent = fs.readFileSync(indata, 'utf-8');
   const lines = fileContent.split(/\n/);
@@ -16,22 +16,29 @@ try  {
     if(line === '') continue;
     const [review,sentiment] = line.split(delimiter).map(item=>
       item.trim());
+     // if (!review || !sentiment) {continue;}
       const shortReview =review.substring(0, 20);
       console.log(shortReview)
       fs.appendFileSync (outdata, `${sentiment}${delimiter}${shortReview}\n`, 'utf-8');
       recordcount ++;
-      
-
-    
+    }
   }
-}
+  catch (err) {
+    console.error('error parsing file:', err);
+    return -1;
+  }
+  return recordcount;
+  }
+  parseFile('./dataFile.csv','./outputFile.csv')
+
+
 //const data = fs.readFileSync(indata, 'utf-8')      //input file is being read using utf encoding
 //const lines = data.split('\n');        //input data split into array of lines to process each row
 //const transformedLines = [];             //initialises an array to store processed lines
 
-let totalRecordsExported = 0;
+//let totalRecordsExported = 0;
 
-for (let i = 1 ; i< lines.length; i++) {      //loops through each line starting from the second, skips header
+/*for (let i = 1 ; i< lines.length; i++) {      //loops through each line starting from the second, skips header
   const line = lines[i].trim();           //trim whitespace from line
   if (line === '') continue ;             //skip empty lines
   const elements = line.split(delimiter)   //splits the lines into columns based on specified delimiter
@@ -47,7 +54,7 @@ for (let i = 1 ; i< lines.length; i++) {      //loops through each line starting
 }
 fs.appendFileSync(outdata, transformedLines.join('\n'), 'utf-8');  //write transformed line to the output file, joining with new line character
 return totalRecordsExported; //return the total number of records exported
-}
+}*/
 module.exports = {
   parseFile,
 }
